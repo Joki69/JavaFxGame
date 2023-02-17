@@ -10,10 +10,16 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.util.Duration;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 public class HelloController {
         private int speed = 5;
@@ -122,6 +128,8 @@ public class HelloController {
     // tick
         public void tick(GraphicsContext gc) {
             if (gameOver) {
+              File score= new File("score.txt");
+
                 // Media deadSnake = new Media(new File("src/main/resources/Sounds/Pac-Man Death - Sound Effect (HD).mp3").toURI().toString());
                 //  MediaPlayer mediaPlayerDeadSnake =new MediaPlayer(deadSnake);
                 // mediaPlayerDeadSnake.play();
@@ -168,12 +176,12 @@ public class HelloController {
 
                 // eat food
                 if (foodX == snake.get(0).x && foodY == snake.get(0).y) {
-                   //String mediaApth="/home/dam2a/IdeaProjects/dam-m6-2022-main/code/uf1/Baniosmixtos/JavaFxGame/src/main/java/com/example/javafxgame/eating.mp3";
-                  // Media eatFruitSound = new Media(getClass().getClassLoader().getResource(mediaApth).toString());
-                    //  Media eatFruitSound = new Media(new File("/home/dam2a/IdeaProjects/dam-m6-2022-main/code/uf1/Baniosmixtos/JavaFxGame/src/main/java/com/example/javafxgame/maybe-next-time-huh.wav").toURI().toString());
-                    // MediaPlayer mediaPlayerEatFruitSound = new MediaPlayer(eatFruitSound);
-                    // mediaPlayerEatFruitSound.play();
-                    //mediaPlayerEatFruitSound.seek(Duration.ZERO);
+                  // String mediaApth="C:\\Users\\Joki\\IdeaProjects\\JavaFxGame2\\src\\main\\java\\com\\example\\javafxgame\\eating.mp3";
+                   //Media eatFruitSound = new Media(getClass().getClassLoader().getResource(mediaApth).toString());
+                    Media eatFruitSound = new Media(new File("src/main/java/com/example/javafxgame/eating.mp3").toURI().toString());
+                    MediaPlayer mediaPlayerEatFruitSound = new MediaPlayer(eatFruitSound);
+                    mediaPlayerEatFruitSound.play();
+                    mediaPlayerEatFruitSound.seek(Duration.ZERO);
                     snake.add(new Corner(-1, -1));
                     newFood();
                 }
@@ -189,11 +197,46 @@ public class HelloController {
                 // background
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, width * cornersize, height * cornersize);
-
+                int scoreActual=0;
                 // score
+                try {
+
+
+                    File file = new File("score.txt");
+                    if (file.createNewFile()) {
+                        System.out.println("File created: " + file.getName());
+                    }
+                    Scanner scanner = new Scanner(file);
+                    while (scanner.hasNextInt()) {
+
+                        scoreActual= scanner.nextInt();
+                        System.out.println(scoreActual);
+                    }
+                    scanner.close();
+                } catch (FileNotFoundException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+
+                if (scoreActual<=score){
+                    scoreActual=score;
+                    try {
+                        FileWriter writer = new FileWriter("score.txt");
+                        writer.write(Integer.toString(scoreActual));
+                        writer.close();
+                    } catch (IOException e) {
+                        System.out.println("An error occurred.");
+                        e.printStackTrace();
+                    }
+                }
                 gc.setFill(Color.WHITE);
                 gc.setFont(new Font("Dialog", 30));
                 gc.fillText("Score: " + score, 10, 30);
+                gc.fillText("Best Score: " +scoreActual, 8, 70);
+
 
                 // random fruit
                 Image naranja = new Image(Main.class.getResource("Images/naranja-removebg-preview.png").toExternalForm());
